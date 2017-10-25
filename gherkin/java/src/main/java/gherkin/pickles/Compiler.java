@@ -179,13 +179,14 @@ public class Compiler {
 
     private String interpolate(String name, List<TableCell> variableCells, List<TableCell> valueCells) {
         int col = 0;
+        String result = name;
         for (TableCell variableCell : variableCells) {
             TableCell valueCell = valueCells.get(col++);
             String header = variableCell.getValue();
             String value = valueCell.getValue();
-            name = name.replace("<" + header + ">", value);
+            result = result.replace("<" + header + ">", value);
         }
-        return name;
+        return result;
     }
 
     private PickleLocation pickleStepLocation(Step step) {
