@@ -31,7 +31,7 @@ public class GherkinEvents {
         this.printPickles = printPickles;
     }
 
-    public Iterable<? extends CucumberEvent> iterable(SourceEvent sourceEvent) {
+    public <S extends SourceEvent> Iterable<CucumberEvent> iterable(S sourceEvent) {
         List<CucumberEvent> cucumberEvents = new ArrayList<>();
 
         try {
