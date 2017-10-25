@@ -2,7 +2,7 @@ package gherkin;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import static gherkin.Parser.RuleType;
 import static gherkin.Parser.TokenType;
 
 public class AstNode {
-    private final Map<RuleType, List<Object>> subItems = new HashMap<RuleType, List<Object>>();
+    private final Map<RuleType, List<Object>> subItems = new EnumMap<>(RuleType.class);
     public final RuleType ruleType;
 
     public AstNode(RuleType ruleType) {
@@ -20,7 +20,7 @@ public class AstNode {
     public void add(RuleType ruleType, Object obj) {
         List<Object> items = subItems.get(ruleType);
         if (items == null) {
-            items = new ArrayList<Object>();
+            items = new ArrayList<>();
             subItems.put(ruleType, items);
         }
         items.add(obj);
@@ -40,8 +40,8 @@ public class AstNode {
     }
 
     public Token getToken(TokenType tokenType) {
-        RuleType ruleType = RuleType.cast(tokenType);
-        return getSingle(ruleType, new Token(null, null));
+        RuleType type = RuleType.cast(tokenType);
+        return getSingle(type, new Token(null, null));
     }
 
     public List<Token> getTokens(TokenType tokenType) {

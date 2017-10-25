@@ -8,14 +8,13 @@ import gherkin.events.SourceEvent;
 import gherkin.stream.GherkinEvents;
 import gherkin.stream.SourceEvents;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 
 public class Main {
-    public static void main(String[] argv) throws IOException {
+    public static void main(String[] argv) {
         final Gson gson = new GsonBuilder().create();
 
         List<String> args = new ArrayList<>(asList(argv));

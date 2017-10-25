@@ -23,7 +23,7 @@ public class GherkinLine implements IGherkinLine {
 
     @Override
     public void detach() {
-
+    	// Not implemented yet
     }
 
     @Override
@@ -65,7 +65,7 @@ public class GherkinLine implements IGherkinLine {
 
     @Override
     public List<GherkinLineSpan> getTableCells() {
-        List<GherkinLineSpan> lineSpans = new ArrayList<GherkinLineSpan>();
+        List<GherkinLineSpan> lineSpans = new ArrayList<>();
         StringBuilder cell = new StringBuilder();
         boolean beforeFirst = true;
         int startCol = 0;
@@ -107,13 +107,20 @@ public class GherkinLine implements IGherkinLine {
     }
 
     private List<GherkinLineSpan> getSpans(String delimiter) {
-        List<GherkinLineSpan> lineSpans = new ArrayList<GherkinLineSpan>();
-        Scanner scanner = new Scanner(trimmedLineText).useDelimiter(delimiter);
-        while (scanner.hasNext()) {
-            String cell = scanner.next();
-            int column = scanner.match().start() + indent() + 1;
-            lineSpans.add(new GherkinLineSpan(column, cell));
-        }
-        return lineSpans;
+        List<GherkinLineSpan> lineSpans = new ArrayList<>();
+        
+        try (Scanner scanner = new Scanner(trimmedLineText).useDelimiter(delimiter);) {
+	        
+	        while (scanner.hasNext()) {
+	            String cell = scanner.next();
+	            int column = scanner.match().start() + indent() + 1;
+	            lineSpans.add(new GherkinLineSpan(column, cell));
+	        }
+	        
+	        return lineSpans;
+        } catch (NullPointerException npe) {
+        	// Handle NPE here
+        	return new ArrayList<>();
+        }  
     }
 }

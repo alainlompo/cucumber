@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Events {
+	
+	private Events() {
+	}
+	
     public static List<CucumberEvent> generate(String data, String uri) {
         return generate(data, uri, new TokenMatcher());
     }
