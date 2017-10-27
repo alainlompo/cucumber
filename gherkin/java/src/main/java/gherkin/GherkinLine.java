@@ -88,8 +88,7 @@ public class GherkinLine implements IGherkinLine {
                 }
                 cell = new StringBuilder();
             } else if (c == '\\') {
-                col++;
-                c = trimmedLineText.charAt(col);
+                c = trimmedLineText.charAt(col+1);
                 if (c == 'n') {
                     cell.append('\n');
                 } else {
