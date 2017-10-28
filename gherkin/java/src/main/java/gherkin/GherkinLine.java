@@ -63,6 +63,45 @@ public class GherkinLine implements IGherkinLine {
         // TODO aslak: extract startsWithFrom method for clarity
     }
 
+    
+    int processFirstCellOrAfter(StringBuilder cell, List<GherkinLineSpan> lineSpans, int col, int startCol) {
+    	int contentStart = 0;
+        while (contentStart < cell.length() && Character.isWhitespace(cell.charAt(contentStart))) {
+            contentStart++;
+        }
+        if (contentStart == cell.length()) {
+            contentStart = 0;
+        }
+        lineSpans.add(new GherkinLineSpan(indent() + startCol + contentStart + 2, cell.toString().trim()));
+        return col;
+    }
+    
+    ProcessState processVerticalBar(StringBuilder cell, List<GherkinLineSpan> lineSpans, boolean beforeFirst,int col, int startCol ) {
+    	boolean beforeFirstUpdate = beforeFirst;
+    	int startColUpdate = startCol;
+    	if (beforeFirst) {
+            // Skip the first empty span
+    		beforeFirstUpdate = false;
+        } else {
+            startColUpdate = processFirstCellOrAfter(cell, lineSpans, col, startCol);
+        }
+        return new ProcessState(beforeFirstUpdate, startColUpdate, new StringBuilder());
+    }
+    
+    ProcessState processAntiSlash(StringBuilder cell, int col) {
+    	int colUpdate =col + 1;
+        char c = trimmedLineText.charAt(colUpdate);
+        if (c == 'n') {
+            cell.append('\n');
+        } else {
+            if (c != '|' && c != '\\') {
+                cell.append('\\');
+            }
+            cell.append(c);
+        }
+        return new ProcessState(colUpdate, cell);
+    }
+    
     @Override
     public List<GherkinLineSpan> getTableCells() {
         List<GherkinLineSpan> lineSpans = new ArrayList<>();
@@ -74,36 +113,15 @@ public class GherkinLine implements IGherkinLine {
         	col++;
         	char c = trimmedLineText.charAt(col);
             if (c == '|') {
-                if (beforeFirst) {
-                    // Skip the first empty span
-                    beforeFirst = false;
-                } else {
-                    int contentStart = 0;
-                    while (contentStart < cell.length() && Character.isWhitespace(cell.charAt(contentStart))) {
-                        contentStart++;
-                    }
-                    if (contentStart == cell.length()) {
-                        contentStart = 0;
-                    }
-                    lineSpans.add(new GherkinLineSpan(indent() + startCol + contentStart + 2, cell.toString().trim()));
-                    startCol = col;
-                }
-                cell = new StringBuilder();
+                ProcessState state = processVerticalBar(cell, lineSpans, beforeFirst, col, startCol);
+                startCol = state.getStartCol();
+                beforeFirst = state.isBeforeFirst();
+                cell = state.getCell();
             } else if (c == '\\') {
-            	col++;
-                c = trimmedLineText.charAt(col);
-                if (c == 'n') {
-                    cell.append('\n');
-                } else {
-                    if (c != '|' && c != '\\') {
-                        cell.append('\\');
-                    }
-                    cell.append(c);
-                }
+                col = processAntiSlash(cell, col).getCol();
             } else {
                 cell.append(c);
             }
-        	
         } while (col < trimmedLineText.length());
         return lineSpans;
     }
@@ -124,5 +142,57 @@ public class GherkinLine implements IGherkinLine {
         	// Handle NPE here
         	return new ArrayList<>();
         }  
+    }
+    
+    class ProcessState {
+    	private boolean beforeFirst;
+    	private int startCol;
+    	private int col;
+    	private StringBuilder cell;
+
+		public ProcessState(boolean beforeFirst, int startCol, StringBuilder cell) {
+			super();
+			this.beforeFirst = beforeFirst;
+			this.startCol = startCol;
+			this.cell = cell;
+		}
+		
+		public ProcessState(int col, StringBuilder cell) {
+			super();
+			this.col = col;
+			this.cell = cell;
+		}
+
+		public boolean isBeforeFirst() {
+			return beforeFirst;
+		}
+
+		public void setBeforeFirst(boolean beforeFirst) {
+			this.beforeFirst = beforeFirst;
+		}
+
+		public int getStartCol() {
+			return startCol;
+		}
+
+		public void setStartCol(int startCol) {
+			this.startCol = startCol;
+		}
+
+		public StringBuilder getCell() {
+			return cell;
+		}
+
+		public void setCell(StringBuilder cell) {
+			this.cell = cell;
+		}
+
+		public int getCol() {
+			return col;
+		}
+
+		public void setCol(int col) {
+			this.col = col;
+		}
     }
 }
