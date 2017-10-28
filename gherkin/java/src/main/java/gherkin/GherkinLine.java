@@ -69,8 +69,10 @@ public class GherkinLine implements IGherkinLine {
         StringBuilder cell = new StringBuilder();
         boolean beforeFirst = true;
         int startCol = 0;
-        for (int col = 0; col < trimmedLineText.length(); col++) {
-            char c = trimmedLineText.charAt(col);
+        int col = -1;
+        do {
+        	col++;
+        	char c = trimmedLineText.charAt(col);
             if (c == '|') {
                 if (beforeFirst) {
                     // Skip the first empty span
@@ -88,7 +90,8 @@ public class GherkinLine implements IGherkinLine {
                 }
                 cell = new StringBuilder();
             } else if (c == '\\') {
-                c = trimmedLineText.charAt(col+1);
+            	col++;
+                c = trimmedLineText.charAt(col);
                 if (c == 'n') {
                     cell.append('\n');
                 } else {
@@ -100,8 +103,8 @@ public class GherkinLine implements IGherkinLine {
             } else {
                 cell.append(c);
             }
-        }
-
+        	
+        } while (col < trimmedLineText.length());
         return lineSpans;
     }
 
